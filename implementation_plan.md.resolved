@@ -1,0 +1,94 @@
+# Universal Anti-Forensics Detection Engine
+
+This document outlines the architecture and implementation details for a Universal Anti-Forensics Detection Engine capable of static artifact analysis and live system monitoring.
+
+## Goal Description
+Build a modular, domain-agnostic framework to detect the 5 Universal Anti-Forensic Actions: DESTROY, MODIFY, HIDE, FABRICATE, and PREVENT. The system requires a universal input parser, specialized analysis engines (Temporal, Storage, Network, Main Memory), a live monitoring module, a unified scoring engine, and a cryptographically secured reporting pipeline visualized via a Streamlit dashboard.
+
+## Proposed Changes
+
+### Configuration and Dependencies
+
+#### [NEW] requirements.txt
+Defines project dependencies.
+- `pytsk3`
+- `scapy`
+- `dpkt`
+- `volatility3`
+- `streamlit`
+- `pandas`
+- `watchdog` (for live file system monitoring if applicable in Python)
+- `psutil` (for live system metrics)
+
+### Core Framework
+
+#### [NEW] src/core/parser.py
+Implements the `Universal Input Parser` capable of identifying and routing:
+- Disk Images
+- RAM Dumps
+- PCAP files
+- Generic Logs
+
+#### [NEW] src/core/live_agent.py
+Implements the `Live Monitoring Module`.
+- Lightweight background process.
+- Hooks into system to monitor active file system changes and network states.
+- Triggers volatile memory snapshots on suspicious events.
+
+### Analysis Engines
+
+#### [NEW] src/analyzers/temporal.py
+Implements the `Temporal Analyzer`.
+- Detects impossible sequences (effect before cause).
+- Detects timestamp clustering (bulk "timestomping").
+
+#### [NEW] src/analyzers/storage.py
+Implements the `Storage Analyzer`.
+- Uses `pytsk3`.
+- Entropy analysis for hidden/encrypted data.
+- Metadata vs. content mismatches.
+
+#### [NEW] src/analyzers/network.py
+Implements the `Network Analyzer`.
+- Uses `scapy` / `dpkt`.
+- Detects protocol anomalies (e.g., DNS tunneling).
+- Detects "Ghost Connections".
+
+#### [NEW] src/analyzers/memory.py
+Implements the `Main Memory Engine`.
+- Wraps `volatility3`.
+- Identifies hidden RAM regions.
+- Detects anti-acquisition triggers.
+
+### Scoring and Reporting
+
+#### [NEW] src/engine/scoring.py
+Implements the `Unified Scoring Engine`.
+- Aggregates anomalies into the 5 categories: DESTROY, MODIFY, HIDE, FABRICATE, PREVENT.
+
+#### [NEW] src/engine/reporting.py
+Implements the `Reporting Engine`.
+- Generates structured JSON output.
+- Every anomaly maps to a specific sector, packet, or memory address.
+- Secures the report with a SHA-256 cryptographic chain.
+
+### Visualization
+
+#### [NEW] src/dashboard/app.py
+Implements the `Streamlit Dashboard`.
+- Reads output from the scoring engine.
+- Visualizes both uploaded static artifacts and live system triggers in real-time.
+
+#### [NEW] main.py
+CLI entry point to run static analysis or start the live agent.
+
+## Verification Plan
+
+### Automated Tests
+- Create mock disk images, PCAPs, and memory dumps with known anti-forensic artifacts.
+- Run the extraction and analysis pipeline to verify correct anomaly detection and scoring.
+- Verify SHA-256 chain integrity in the generated reports.
+
+### Manual Verification
+- Run the Streamlit dashboard and visually verify that the data is presented correctly.
+- Test the live agent in a controlled environment by triggering file modifications or suspicious network activity and verifying that a volatile memory snapshot is triggered.

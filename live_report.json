@@ -1,0 +1,41 @@
+{
+    "integrity_hash_sha256": "9c828d8c5eeab3296ee8d42cf897e8f1ed53dbe7dfd0aef59bd53f6215bf8d2c",
+    "content": {
+        "DESTROY": [
+            {
+                "category": "DESTROY",
+                "description": "Potential evidence destruction: Deleted file .\\report.json",
+                "source": "live_fs",
+                "reference": ".\\report.json",
+                "confidence": 0.8
+            },
+            {
+                "category": "DESTROY",
+                "description": "Potential evidence destruction: Deleted file .\\test.pcap",
+                "source": "live_fs",
+                "reference": ".\\test.pcap",
+                "confidence": 0.8
+            }
+        ],
+        "MODIFY": [],
+        "HIDE": [],
+        "FABRICATE": [],
+        "PREVENT": [
+            {
+                "category": "PREVENT",
+                "description": "Automated memory snapshot triggered due to: File Deletion: .\\report.json",
+                "source": "live_agent",
+                "reference": "snapshot.raw",
+                "confidence": 1.0
+            },
+            {
+                "category": "PREVENT",
+                "description": "Automated memory snapshot triggered due to: File Deletion: .\\test.pcap",
+                "source": "live_agent",
+                "reference": "snapshot.raw",
+                "confidence": 1.0
+            }
+        ],
+        "total_anomalies": 4
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "integrity_hash_sha256": "e41e3dd28eeed701b373b44bd3570c4d238f34b66a6fd253c9a63548ec3a45b8",
+    "content": {
+        "DESTROY": [],
+        "MODIFY": [],
+        "HIDE": [
+            {
+                "category": "HIDE",
+                "description": "Ghost Connection detected (Data pushed without handshake captured).",
+                "source": "network",
+                "reference": "TCP Stream: 192.168.1.1:20-192.168.1.2:80",
+                "confidence": 0.6
+            }
+        ],
+        "FABRICATE": [],
+        "PREVENT": [],
+        "total_anomalies": 1
+    }
+}

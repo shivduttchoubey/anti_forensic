@@ -1,0 +1,56 @@
+# Universal Anti-Forensics Detection Engine - Walkthrough
+
+## Overview
+The Universal Anti-Forensics Detection Engine has been successfully implemented according to the required specifications. It is a modular, domain-agnostic framework capable of analyzing both static artifacts and live system streams to detect anti-forensic activities.
+
+## Implementation Details
+
+### Core Architecture
+- **Universal Input Parser** ([src/core/parser.py](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/src/core/parser.py)): Routes incoming artifacts intelligently based on file extensions/signatures. Supports `.pcap`/`.pcapng`, disk images (`.raw`, `.dd`), memory dumps (`.vmem`, `.raw`), and logical files like CSVs/Logs.
+- **Unified Scoring Engine** ([src/engine/scoring.py](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/src/engine/scoring.py)): Receives signals from all analyzers and categorizes anomalies into the 5 core buckets: `DESTROY`, `MODIFY`, `HIDE`, `FABRICATE`, and `PREVENT`. Assesses confidence levels and preserves forensic references.
+- **Reporting Engine** ([src/engine/reporting.py](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/src/engine/reporting.py)): Outputs structured JSON combining all findings and appends a SHA-256 integrity hash tying the entire report together cryptographically.
+- **CLI Entry Point** ([main.py](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/main.py)): Defines the argument parsing for [static](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/main.py#10-24) vs [live](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/main.py#25-41) executions and orchestrates the modules.
+
+### The 4 Analyzers
+1. **Network** ([src/analyzers/network.py](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/src/analyzers/network.py)): Implemented using `scapy`. Detects unusually long DNS queries (Tunneling) and TCP connections pushing data without a valid handshake ("Ghost Connections").
+2. **Temporal** ([src/analyzers/temporal.py](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/src/analyzers/temporal.py)): Uses `pandas` to analyze timelines. Detects "timestomping" (massive clustering of timestamps in the same exact second) and impossible sequences (e.g., file accessed before creation).
+3. **Storage** ([src/analyzers/storage.py](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/src/analyzers/storage.py)): Implements `pytsk3` ingestion for direct file system traversal of disk images, falling back to raw block entropy calculations if no recognizable filesystem is found. Detects high entropy indicating hidden/encrypted data and mismatches like high entropy in [.txt](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/requirements.txt) files.
+4. **Main Memory** ([src/analyzers/memory.py](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/src/analyzers/memory.py)): Wraps `volatility3` as a subprocess to scan for hidden processes/unlinked structures (`windows.psscan`) and injected memory regions (`windows.malfind`).
+
+### Live Monitor Module ([src/core/live_agent.py](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/src/core/live_agent.py))
+- Uses `watchdog` to monitor real-time file system actions (e.g., mass deletion of log files).
+- Uses `psutil` in a daemon thread to monitor for anti-forensic tools (e.g., `sdelete`, `wireshark`, `procmon`).
+- Automatically triggers a simulated volatile memory snapshot when critical alerts occur.
+
+### Streamlit Dashboard ([src/dashboard/app.py](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/src/dashboard/app.py))
+A fast, interactive web interface built with Streamlit.
+- Verifies and displays the SHA-256 Integrity hash.
+- Provides top-level metrics for the 5 categories.
+- Displays a detailed interactive data grid representing all anomalies mapped to their references and confidence levels.
+- Supports Auto-Refresh for Live Mode.
+
+## Validation Performed
+- **Dependency installation**: Setup via [requirements.txt](file:///c:/S/Projects%20and%20researches/anti_forensic_hackathon/requirements.txt). Note: `pytsk3` can be difficult to compile on certain Windows hosts; the tool will gracefully fallback to raw file entropy chunking if it fails, which was tested.
+- **CLI Commands**:
+  - Tested `python main.py static -f test.pcap --ui`
+  - Tested `python main.py live -d . --ui`
+- **Output Validation**: Created a crafted mock SCAPY packet demonstrating a "Ghost Connection". The Network analyzer successfully identified it and securely chained the output into `report.json` with a valid `integrity_hash_sha256`.
+
+## How to Run
+
+**1. Static Analysis (e.g. PCAP)**
+```bash
+python main.py static -f artifact.pcap --ui
+```
+
+**2. Live System Monitoring**
+```bash
+# Monitor the current directory for destructive file actions 
+# and the whole system for suspicious tools
+python main.py live -d . --ui
+```
+
+**3. Manually View the Dashboard**
+```bash
+streamlit run src/dashboard/app.py
+```

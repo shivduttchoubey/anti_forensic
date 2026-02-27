@@ -1,0 +1,8 @@
+pytsk3
+scapy
+dpkt
+volatility3
+streamlit
+pandas
+watchdog
+psutil
