@@ -1,23 +1,144 @@
 {
-    "integrity_hash_sha256": "2f89c1322280330564ec72895c40f182e044e1bd82b87a27949db87b85e4d172",
+    "integrity_hash_sha256": "0b4634e46bf00c00ba898508321868c9f18df2637fec3dbc659f1fe0f9df80f4",
     "content": {
-        "DESTROY": [],
+        "DESTROY": [
+            {
+                "category": "DESTROY",
+                "description": "Wipe Signature: Uniform single-byte fill (0x00). Indicates intentional data destruction using overwrite tools.",
+                "source": "Storage Engine",
+                "reference": "Block 0, Offset: 0x00000000",
+                "confidence": 90,
+                "timestamp": "2026-02-28T15:00:14.298146"
+            },
+            {
+                "category": "DESTROY",
+                "description": "Wipe Signature: Uniform single-byte fill (0xFF). Indicates intentional data destruction using overwrite tools.",
+                "source": "Storage Engine",
+                "reference": "Block 1, Offset: 0x00001000",
+                "confidence": 90,
+                "timestamp": "2026-02-28T15:00:14.298410"
+            },
+            {
+                "category": "DESTROY",
+                "description": "Wipe Signature: Uniform single-byte fill (0x55). Indicates intentional data destruction using overwrite tools.",
+                "source": "Storage Engine",
+                "reference": "Block 2, Offset: 0x00002000",
+                "confidence": 90,
+                "timestamp": "2026-02-28T15:00:14.298654"
+            },
+            {
+                "category": "DESTROY",
+                "description": "Wipe Signature: 0x924924 \u2014 Gutmann pattern 15. Indicates intentional data destruction using overwrite tools.",
+                "source": "Storage Engine",
+                "reference": "Block 3, Offset: 0x00003000",
+                "confidence": 90,
+                "timestamp": "2026-02-28T15:00:14.298918"
+            },
+            {
+                "category": "DESTROY",
+                "description": "Wipe Signature: Uniform single-byte fill (0x00). Indicates intentional data destruction using overwrite tools.",
+                "source": "Storage Engine",
+                "reference": "Block 0, Offset: 0x00000000",
+                "confidence": 90,
+                "timestamp": "2026-02-28T15:00:46.762027"
+            },
+            {
+                "category": "DESTROY",
+                "description": "Wipe Signature: Uniform single-byte fill (0xFF). Indicates intentional data destruction using overwrite tools.",
+                "source": "Storage Engine",
+                "reference": "Block 1, Offset: 0x00001000",
+                "confidence": 90,
+                "timestamp": "2026-02-28T15:00:46.762291"
+            },
+            {
+                "category": "DESTROY",
+                "description": "Wipe Signature: Uniform single-byte fill (0x55). Indicates intentional data destruction using overwrite tools.",
+                "source": "Storage Engine",
+                "reference": "Block 2, Offset: 0x00002000",
+                "confidence": 90,
+                "timestamp": "2026-02-28T15:00:46.762576"
+            },
+            {
+                "category": "DESTROY",
+                "description": "Wipe Signature: 0x924924 \u2014 Gutmann pattern 15. Indicates intentional data destruction using overwrite tools.",
+                "source": "Storage Engine",
+                "reference": "Block 3, Offset: 0x00003000",
+                "confidence": 90,
+                "timestamp": "2026-02-28T15:00:46.762911"
+            }
+        ],
         "MODIFY": [],
         "HIDE": [
             {
                 "category": "HIDE",
-                "description": "Protocol STAT Violation: Ghost Connection (Data push without SYN).",
+                "description": "Sustained High-Entropy Region (\u22653 blocks, avg ~7.9+ bits/byte) starting at Block 4 (Offset 0x00004000). Consistent with VeraCrypt/TrueCrypt/LUKS hidden volumes or fully-encrypted containers.",
+                "source": "Storage Engine",
+                "reference": "Blocks 4\u20136",
+                "confidence": 88,
+                "timestamp": "2026-02-28T15:00:14.300730"
+            },
+            {
+                "category": "HIDE",
+                "description": "Sustained High-Entropy Region (\u22653 blocks, avg ~7.9+ bits/byte) starting at Block 4 (Offset 0x00004000). Consistent with VeraCrypt/TrueCrypt/LUKS hidden volumes or fully-encrypted containers.",
+                "source": "Storage Engine",
+                "reference": "Blocks 4\u20136",
+                "confidence": 88,
+                "timestamp": "2026-02-28T15:00:46.764516"
+            },
+            {
+                "category": "HIDE",
+                "description": "Protocol STAT Violation \u2014 Ghost Connection: Data/FIN seen on stream '10.5.0.99:4444->203.0.113.5:443' with no prior SYN. Evades IDS by starting sessions mid-stream.",
                 "source": "Network Engine",
-                "reference": "TCP Stream: 192.168.1.1:5000->10.0.0.1:443",
-                "confidence": 85,
-                "timestamp": "2026-02-28T12:27:52.149570"
+                "reference": "Stream: 10.5.0.99:4444->203.0.113.5:443",
+                "confidence": 87,
+                "timestamp": "2026-02-28T14:57:52.420605"
+            },
+            {
+                "category": "HIDE",
+                "description": "Protocol STAT Violation \u2014 Ghost Connection: Data/FIN seen on stream '192.168.1.5:11111->203.0.113.2:80' with no prior SYN. Evades IDS by starting sessions mid-stream.",
+                "source": "Network Engine",
+                "reference": "Stream: 192.168.1.5:11111->203.0.113.2:80",
+                "confidence": 87,
+                "timestamp": "2026-02-28T14:57:52.420724"
+            },
+            {
+                "category": "HIDE",
+                "description": "Protocol STAT Violation \u2014 Ghost Connection: Data/FIN seen on stream '192.168.1.5:54000->45.33.32.156:4443' with no prior SYN. Evades IDS by starting sessions mid-stream.",
+                "source": "Network Engine",
+                "reference": "Stream: 192.168.1.5:54000->45.33.32.156:4443",
+                "confidence": 87,
+                "timestamp": "2026-02-28T14:57:52.420816"
+            },
+            {
+                "category": "HIDE",
+                "description": "DNS Tunneling Detected: Query 'aGVsbG8gd29ybGQgdGhpcyBpcyBhIHRlc3QgdHVu...' (63 chars) with subdomain entropy=4.36 bits/byte. High entropy in long DNS labels is characteristic of Base32/Base64-encoded data channels.",
+                "source": "Network Engine",
+                "reference": "DNS Server: 8.8.8.8, Domain: evil-c2-domain.com",
+                "confidence": 86,
+                "timestamp": "2026-02-28T14:57:52.424030"
+            },
+            {
+                "category": "HIDE",
+                "description": "Protocol Mismatch: SSH handshake banner detected on port 80 (from 192.168.1.5:11111). SSH is normally on port 22; running it on a different port evades firewall rules.",
+                "source": "Network Engine",
+                "reference": "Stream: 192.168.1.5:11111 -> 203.0.113.2:80",
+                "confidence": 82,
+                "timestamp": "2026-02-28T14:57:52.426695"
+            },
+            {
+                "category": "HIDE",
+                "description": "ICMP Tunneling: Oversized payload (512 bytes, entropy=-0.00) in ICMP echo from 192.168.1.5 to 203.0.113.1. Standard ICMP payloads are 32-64 bytes; larger payloads suggest data covert channel.",
+                "source": "Network Engine",
+                "reference": "Src: 192.168.1.5, Dst: 203.0.113.1",
+                "confidence": 75,
+                "timestamp": "2026-02-28T14:57:52.424462"
             }
         ],
         "FABRICATE": [],
         "PREVENT": [],
         "metadata": {
-            "total_count": 1,
-            "generation_time": "2026-02-28T12:27:52.149758"
+            "total_count": 16,
+            "generation_time": "2026-02-28T15:00:46.765445"
         }
     }
 }
