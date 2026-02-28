@@ -1,19 +1,40 @@
 {
-    "integrity_hash_sha256": "e41e3dd28eeed701b373b44bd3570c4d238f34b66a6fd253c9a63548ec3a45b8",
-    "content": {
-        "DESTROY": [],
-        "MODIFY": [],
-        "HIDE": [
+  "integrity_hash_sha256": "placeholder_hash_123",
+  "content": {
+    "DESTROY": [],
+    "MODIFY": [],
+    "HIDE": [
+      {
+        "anomaly_type": "ghost_connection",
+        "evidence": {
+          "streams": [
             {
-                "category": "HIDE",
-                "description": "Ghost Connection detected (Data pushed without handshake captured).",
-                "source": "network",
-                "reference": "TCP Stream: 192.168.1.1:20-192.168.1.2:80",
-                "confidence": 0.6
+              "stream": "192.168.1.1:5000-10.0.0.1:443",
+              "description": "data without handshake"
             }
-        ],
-        "FABRICATE": [],
-        "PREVENT": [],
-        "total_anomalies": 1
-    }
+          ]
+        },
+        "confidence": 0.6
+      }
+    ],
+    "FABRICATE": [],
+    "PREVENT": [
+      {
+        "anomaly_type": "high_entropy",
+        "evidence": {
+          "regions": [
+            {
+              "offset": 0,
+              "entropy": 7.955302062911014
+            },
+            {
+              "offset": 4096,
+              "entropy": 7.961148833434964
+            }
+          ]
+        },
+        "confidence": 0.6
+      }
+    ]
+  }
 }

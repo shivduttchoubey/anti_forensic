@@ -57,14 +57,21 @@ def main():
             
     if flat_data:
         df = pd.DataFrame(flat_data)
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(df, width='stretch')
         
         st.subheader("Detailed Findings")
         for item in flat_data:
-             with st.expander(f"[{item['category']}] {item['description']}"):
-                 st.write(f"**Source:** {item['source']}")
-                 st.write(f"**Reference:** {item['reference']}")
-                 st.write(f"**Confidence:** {item['confidence']}")
+             anomaly_type = item.get('anomaly_type', item.get('description', 'unknown'))
+             with st.expander(f"[{item['category']}] {anomaly_type}"):
+                 st.write(f"**Anomaly Type:** {anomaly_type}")
+                 st.write(f"**Confidence:** {item.get('confidence', 'N/A')}")
+                 if 'evidence' in item:
+                     st.write(f"**Evidence:**")
+                     st.json(item['evidence'])
+                 if 'source' in item:
+                     st.write(f"**Source:** {item['source']}")
+                 if 'reference' in item:
+                     st.write(f"**Reference:** {item['reference']}")
     else:
         st.success("No anomalies detected in the current report.")
 
