@@ -9,7 +9,7 @@ import numpy as np
 # --- PAGE CONFIG ---
 st.set_page_config(
     page_title="Anti-Forensic Analysis Framework",
-    page_icon="🛡️",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -103,7 +103,7 @@ def render_grid_visualization(entropy_data=None):
 from main import ForensicFramework
 
 def main():
-    st.title("🛡️ Anti-Forensic Analysis Framework")
+    st.title("Anti-Forensic Analysis Framework")
     st.markdown("*Master Dashboard: Detecting Digital Manipulation with Evidence-Source Referencing*")
 
     framework = ForensicFramework()
@@ -150,13 +150,15 @@ def main():
     with tab_memory:
         st.header("Engine 4: Main Memory Analysis Engine")
         st.warning("Focus: Collection Prevention, Hidden RAM pages, and Corrupted Payloads.")
-        mem_path = st.text_input("Memory Dump File (raw, vmem, dmp)", "test.vmem")
+        mem_file = st.file_uploader("Upload Memory Dump (.vmem, .raw, .dmp)", type=['vmem', 'raw', 'dmp', 'mem'], key="mem_file")
         if st.button("Start Collection Prevention Scan"):
-            if os.path.exists(mem_path):
-                st.session_state.report = framework.run_static(mem_path)
-                st.success("Memory Scan Complete")
+            if mem_file:
+                tmp_path = f"temp_{mem_file.name}"
+                with open(tmp_path, "wb") as f: f.write(mem_file.getbuffer())
+                st.session_state.report = framework.run_static(tmp_path)
+                st.success(f"Memory Scan Complete — {mem_file.name}")
             else:
-                st.error("Memory file not found.")
+                st.error("Please upload a memory dump file first.")
 
     # --- NETWORK TAB ---
     with tab_network:
@@ -176,7 +178,8 @@ def main():
         st.header("Engine 2: Storage Artifact Analyzer")
         top_col1, top_col2 = st.columns([1, 1])
         with top_col1:
-            disk_path = st.text_input("Disk Image / Mounted Volume", value="test.pcap") # Using pcap as test image
+            disk_file = st.file_uploader("Upload Disk Image (.img, .dd, .raw)", type=['img', 'dd', 'raw', 'bin'], key="disk_file")
+            disk_path = st.text_input("— or enter a local path / mounted volume —", value="")
             options = st.multiselect("Active Sub-Engines", [
                 "$LogFile & $USN Journal Parsing",
                 "Unallocated Entropy Mapping",
@@ -184,11 +187,17 @@ def main():
             ], default=["Unallocated Entropy Mapping"])
         with top_col2:
              if st.button("🚀 Execute Forensic Surface Scan", type="primary"):
-                 if os.path.exists(disk_path):
-                     st.session_state.report = framework.run_static(disk_path)
+                 target = None
+                 if disk_file:
+                     target = f"temp_{disk_file.name}"
+                     with open(target, "wb") as f: f.write(disk_file.getbuffer())
+                 elif disk_path and os.path.exists(disk_path):
+                     target = disk_path
+                 if target:
+                     st.session_state.report = framework.run_static(target)
                      st.success("Deep Disk Analysis Complete")
                  else:
-                     st.error("Path not found.")
+                     st.error("Upload a disk image or enter a valid local path.")
         
         st.divider()
         render_grid_visualization()

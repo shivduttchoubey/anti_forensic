@@ -1,31 +1,23 @@
 {
-    "integrity_hash_sha256": "49e1de5c4bda75f942cd8adabb9c7f0b6469a7383ffb03c17a3869284a8eec6b",
+    "integrity_hash_sha256": "2f89c1322280330564ec72895c40f182e044e1bd82b87a27949db87b85e4d172",
     "content": {
         "DESTROY": [],
-        "MODIFY": [
+        "MODIFY": [],
+        "HIDE": [
             {
-                "category": "MODIFY",
-                "description": "Timestamp Mismatch: $SI Created (2020-01-01 00:00:00) != $FN Created (2024-05-20 12:30:00).",
-                "source": "Temporal Engine",
-                "reference": "File: /windows/system32/cmd.exe",
-                "confidence": 95,
-                "timestamp": "2026-02-28T10:44:00.066902"
-            },
-            {
-                "category": "MODIFY",
-                "description": "Mass Timestamp Clustering: 600 entries at 2026-02-28 00:00:00.",
-                "source": "Temporal Engine",
-                "reference": "Log: test_timeline.csv",
-                "confidence": 80,
-                "timestamp": "2026-02-28T10:44:00.061856"
+                "category": "HIDE",
+                "description": "Protocol STAT Violation: Ghost Connection (Data push without SYN).",
+                "source": "Network Engine",
+                "reference": "TCP Stream: 192.168.1.1:5000->10.0.0.1:443",
+                "confidence": 85,
+                "timestamp": "2026-02-28T12:27:52.149570"
             }
         ],
-        "HIDE": [],
         "FABRICATE": [],
         "PREVENT": [],
         "metadata": {
-            "total_count": 2,
-            "generation_time": "2026-02-28T10:44:00.066936"
+            "total_count": 1,
+            "generation_time": "2026-02-28T12:27:52.149758"
         }
     }
 }
