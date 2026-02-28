@@ -7,8 +7,8 @@ import plotly.express as px
 import numpy as np
 
 # Clear Streamlit caches on each page load
-st.experimental_memo.clear()
-st.experimental_singleton.clear()
+# st.experimental_memo.clear()
+# st.experimental_singleton.clear()
 
 # --- PAGE CONFIG ---
 st.set_page_config(
