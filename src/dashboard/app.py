@@ -43,7 +43,7 @@ st.markdown("""
     .metric-value { font-size: 2rem; font-weight: bold; color: #58a6ff; }
     .metric-label { font-size: 0.9rem; color: #8b949e; margin-top: 5px; }
     </style>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 # --- UTILITIES ---
 def load_report(filepath="report.json"):
@@ -66,7 +66,7 @@ def render_summary_cards(content):
                     <div class="metric-value">{count}</div>
                     <div class="metric-label">{cat}</div>
                 </div>
-            """, unsafe_allow_value=True)
+            """, unsafe_allow_html=True)
 
 def render_grid_visualization(entropy_data=None):
     """
@@ -207,7 +207,7 @@ def main():
         with col2:
              status_color = "green" if st.session_state.live_monitoring else "red"
              status_text = "GUARD PROTECTING" if st.session_state.live_monitoring else "AGENT INACTIVE"
-             st.markdown(f"**STATUS:** <span style='color:{status_color}; font-weight:bold'>{status_text}</span>", unsafe_allow_value=True)
+             st.markdown(f"**STATUS:** <span style='color:{status_color}; font-weight:bold'>{status_text}</span>", unsafe_allow_html=True)
              if st.session_state.live_monitoring:
                  st.progress(0.72, "Monitoring OS Transaction Loops...")
 
