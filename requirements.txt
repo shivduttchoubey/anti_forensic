@@ -7,3 +7,7 @@ pandas
 watchdog
 psutil
 plotly
+pandas
+scapy
+psutil
+watchdog
