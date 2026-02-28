@@ -1,3 +1,5 @@
 # analyzers package
-from .network import NetworkAnalyzer, correlate_results
-from .memory import MemoryAnalyzer
+from .temporal import TemporalAnalyzer
+from .storage import StorageAnalyzer
+from .network import NetworkAnalyzer
+from .main_memory import MainMemoryAnalyzer

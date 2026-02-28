@@ -1,6 +1,6 @@
 import pandas as pd
-from src.engine.scoring import Anomaly, get_scoring_engine
 import os
+from src.engine.scoring import Anomaly, get_scoring_engine
 
 class TemporalAnalyzer:
     def __init__(self):
@@ -8,75 +8,71 @@ class TemporalAnalyzer:
 
     def analyze(self, filepath: str):
         if not os.path.exists(filepath):
-            print(f"[-] Log/Timeline not found: {filepath}")
+            print(f"[-] Timeline not found: {filepath}")
             return
             
-        print(f"[*] Analyzing Temporal Data (Logs/Timeline): {filepath}")
+        print(f"[*] Analyzing Temporal integrity: {filepath}")
         
         try:
-            # We attempt to read as CSV. For a real engine, we'd need more
-            # robust parsing for evtx or log formats using Plaso/log2timeline output
+            # For demonstration, we'll try to parse CSV or simple logs
             if filepath.endswith('.csv'):
                 df = pd.read_csv(filepath)
                 self._detect_timestamp_clustering(df, filepath)
                 self._detect_impossible_sequences(df, filepath)
+                self._detect_si_fn_mismatch(df, filepath)
             else:
-                 print(f"[-] Temporal analyzer currently only supports CSV timeline format. Got: {filepath}")
+                 print("[-] Temporal engine expects MFT/Timeline CSV export (e.g., fls -m output).")
         except Exception as e:
-            print(f"[-] Error analyzing temporal data: {e}")
+            print(f"[-] Temporal error: {e}")
 
-    def _detect_timestamp_clustering(self, df, filepath):
+    def _detect_si_fn_mismatch(self, df, filepath):
         """
-        Detects bulk "timestomping" by looking for an unnaturally high number 
-        of timestamp modifications within the same exact second.
-        Assumes a 'timestamp' column and 'event_type' column.
+        Detection of $SI (Standard Information) vs $FN (File Name) timestamp mismatch.
+        Traditional timestomping only affects $SI.
         """
-        # Simplified simulation
-        if 'timestamp' not in df.columns:
+        if not all(col in df.columns for col in ['$SI_Created', '$FN_Created']):
             return
-            
-        # Group by exact second
-        counts = df.groupby('timestamp').size()
+
+        # Find rows where $SI differs from $FN significantly (more than 1 minute)
+        df['$SI_Created'] = pd.to_datetime(df['$SI_Created'])
+        df['$FN_Created'] = pd.to_datetime(df['$FN_Created'])
         
-        # If more than 1000 events happen in the exact same second, that's highly suspicious
-        THRESHOLD = 1000
-        suspicious_times = counts[counts > THRESHOLD]
+        diff = (df['$SI_Created'] - df['$FN_Created']).abs()
+        mismatches = df[diff > pd.Timedelta(minutes=1)]
         
-        for time_val, count in suspicious_times.items():
+        for _, row in mismatches.iterrows():
             anomaly = Anomaly(
                 category="MODIFY",
-                description=f"Timestamp Clustering (Timestomping) Detected. {count} events occurred precisely at {time_val}.",
-                source="temporal",
-                reference=f"File: {filepath} at {time_val}",
-                confidence=0.9
+                description=f"Timestamp Mismatch: $SI Created ({row['$SI_Created']}) != $FN Created ({row['$FN_Created']}).",
+                source="Temporal Engine",
+                reference=f"File: {row.get('file_path', 'unknown')}",
+                confidence=95
             )
             self.scoring.add_anomaly(anomaly)
-            print(f"[!] Temporal Anomaly: {anomaly.description}")
+
+    def _detect_timestamp_clustering(self, df, filepath):
+        if 'timestamp' not in df.columns: return
+        counts = df.groupby('timestamp').size()
+        suspicious = counts[counts > 500]
+        for time_val, count in suspicious.items():
+            self.scoring.add_anomaly(Anomaly(
+                category="MODIFY",
+                description=f"Mass Timestamp Clustering: {count} entries at {time_val}.",
+                source="Temporal Engine",
+                reference=f"Log: {filepath}",
+                confidence=80
+            ))
 
     def _detect_impossible_sequences(self, df, filepath):
-        """
-        Detects effect before cause (e.g., file accessed before it was created).
-        Assumes columns: 'file_path', 'creation_time', 'access_time'
-        """
-        if not all(col in df.columns for col in ['file_path', 'creation_time', 'access_time']):
-            return
-
-        try:
-            df['creation_time'] = pd.to_datetime(df['creation_time'])
-            df['access_time'] = pd.to_datetime(df['access_time'])
-            
-            # Find where accessed before created (impossible unless timestomped or clock skew)
-            impossible = df[df['access_time'] < df['creation_time']]
-            
-            for _, row in impossible.iterrows():
-                anomaly = Anomaly(
-                    category="FABRICATE",
-                    description=f"Impossible Event Sequence: '{row['file_path']}' accessed before creation.",
-                    source="temporal",
-                    reference=f"File: {filepath} Line: {row.name}",
-                    confidence=0.85
-                )
-                self.scoring.add_anomaly(anomaly)
-                print(f"[!] Temporal Anomaly: {anomaly.description}")
-        except Exception as e:
-            print(f"[-] Error in impossible sequence detection: {e}")
+        if not all(col in df.columns for col in ['creation_time', 'modification_time']): return
+        df['creation_time'] = pd.to_datetime(df['creation_time'])
+        df['modification_time'] = pd.to_datetime(df['modification_time'])
+        impossible = df[df['modification_time'] < df['creation_time']]
+        for _, row in impossible.iterrows():
+             self.scoring.add_anomaly(Anomaly(
+                category="FABRICATE",
+                description="Impossible Sequence: Modification date precedes creation.",
+                source="Temporal Engine",
+                reference=f"File: {row.get('file_path', 'unknown')}",
+                confidence=90
+            ))

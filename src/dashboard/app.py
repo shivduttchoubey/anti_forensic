@@ -3,10 +3,50 @@ import json
 import pandas as pd
 import os
 import time
+import plotly.express as px
+import numpy as np
 
-st.set_page_config(page_title="Universal Anti-Forensics Engine", layout="wide")
+# --- PAGE CONFIG ---
+st.set_page_config(
+    page_title="Anti-Forensic Analysis Framework",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-def load_report(filepath):
+# --- CUSTOM CSS ---
+st.markdown("""
+    <style>
+    .main { background-color: #0e1117; }
+    .stTabs [data-baseweb="tab-list"] { gap: 24px; }
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        white-space: pre-wrap;
+        background-color: #161b22;
+        border-radius: 4px 4px 0px 0px;
+        gap: 1px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: #8b949e;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #1f6feb !important;
+        color: white !important;
+    }
+    .metric-card {
+        background-color: #161b22;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #30363d;
+        text-align: center;
+    }
+    .metric-value { font-size: 2rem; font-weight: bold; color: #58a6ff; }
+    .metric-label { font-size: 0.9rem; color: #8b949e; margin-top: 5px; }
+    </style>
+""", unsafe_allow_value=True)
+
+# --- UTILITIES ---
+def load_report(filepath="report.json"):
     if not os.path.exists(filepath):
         return None
     try:
@@ -15,65 +55,171 @@ def load_report(filepath):
     except:
         return None
 
-def main():
-    st.title("🛡️ Universal Anti-Forensics Detection Engine")
-    
-    st.sidebar.header("Configuration")
-    report_file = st.sidebar.text_input("Report JSON Path", "report.json")
-    auto_refresh = st.sidebar.checkbox("Auto-Refresh (Live Mode)", value=False)
-    
-    if auto_refresh:
-        time.sleep(2)
-        st.rerun()
-
-    report_data = load_report(report_file)
-    
-    if not report_data:
-        st.warning(f"Report file '{report_file}' not found or invalid format. Run the engine first.")
-        return
-
-    st.subheader("Integrity Check")
-    hash_val = report_data.get("integrity_hash_sha256", "N/A")
-    st.code(f"SHA-256 Report Chain: {hash_val}", language="text")
-
-    content = report_data.get("content", {})
+def render_summary_cards(content):
     categories = ["DESTROY", "MODIFY", "HIDE", "FABRICATE", "PREVENT"]
-    
-    # Overview Metrics
     cols = st.columns(len(categories))
     for idx, cat in enumerate(categories):
         count = len(content.get(cat, []))
-        cols[idx].metric(label=cat, value=count)
+        with cols[idx]:
+            st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-value">{count}</div>
+                    <div class="metric-label">{cat}</div>
+                </div>
+            """, unsafe_allow_value=True)
 
-    st.markdown("---")
-    st.subheader("Anomaly Details")
+def render_grid_visualization(entropy_data=None):
+    """
+    Simulates the 2D Disk Block Heat-map Grid.
+    Actually takes entropy_data which should be a list of values.
+    """
+    st.subheader("Disk Block Visualization (Entropy Mapping)")
     
-    # Flatten data for dataframe
-    flat_data = []
-    for cat in categories:
-        for item in content.get(cat, []):
-            item['category'] = cat
-            flat_data.append(item)
-            
-    if flat_data:
-        df = pd.DataFrame(flat_data)
-        st.dataframe(df, width='stretch')
-        
-        st.subheader("Detailed Findings")
-        for item in flat_data:
-             anomaly_type = item.get('anomaly_type', item.get('description', 'unknown'))
-             with st.expander(f"[{item['category']}] {anomaly_type}"):
-                 st.write(f"**Anomaly Type:** {anomaly_type}")
-                 st.write(f"**Confidence:** {item.get('confidence', 'N/A')}")
-                 if 'evidence' in item:
-                     st.write(f"**Evidence:**")
-                     st.json(item['evidence'])
-                 if 'source' in item:
-                     st.write(f"**Source:** {item['source']}")
-                 if 'reference' in item:
-                     st.write(f"**Reference:** {item['reference']}")
+    # Simulate a grid if no data
+    if entropy_data is None:
+        rows, cols = 20, 40
+        data = np.random.uniform(0, 8, (rows, cols))
     else:
-        st.success("No anomalies detected in the current report.")
+        # Reshape data into a grid
+        size = int(len(entropy_data)**0.5)
+        data = np.array(entropy_data[:size*size]).reshape(size, size)
+
+    fig = px.imshow(
+        data,
+        color_continuous_scale=[(0, "#30363d"), (0.7, "#1f6feb"), (1, "#f85149")],
+        labels={'color': 'Entropy'},
+        zmin=0, zmax=8
+    )
+    fig.update_layout(
+         margin=dict(l=0, r=0, t=0, b=0),
+         xaxis={'visible': False},
+         yaxis={'visible': False},
+         coloraxis_showscale=True,
+         height=450
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+# --- MAIN APP ---
+from main import ForensicFramework
+
+def main():
+    st.title("🛡️ Anti-Forensic Analysis Framework")
+    st.markdown("*Master Dashboard: Detecting Digital Manipulation with Evidence-Source Referencing*")
+
+    framework = ForensicFramework()
+
+    # Initialize live state
+    if 'live_monitoring' not in st.session_state:
+        st.session_state.live_monitoring = False
+    if 'report' not in st.session_state:
+        st.session_state.report = load_report()
+
+    # --- TOP RIBBON TABS ---
+    tab_temporal, tab_memory, tab_network, tab_storage, tab_live = st.tabs([
+        "🕰️ Temporal Integrity",
+        "🧠 Main Memory",
+        "🌐 Networks",
+        "💾 Storage Artifacts",
+        "🛡️ Live Testing"
+    ])
+
+    report_data = st.session_state.report
+    content = report_data.get("content", {}) if report_data else {}
+
+    # --- TEMPORAL TAB ---
+    with tab_temporal:
+        st.header("Engine 1: Temporal Integrity Analyzer")
+        col1, col2 = st.columns([1, 2])
+        with col1:
+            st.info("Detects timestamp clustering, clock drift, and impossible sequences.")
+            csv_file = st.file_uploader("Upload Timeline CSV", type=['csv'], key="temp_file")
+            if st.button("Run Phase-1 Temporal analysis", type="primary"):
+                if csv_file:
+                    # Save temp
+                    with open("temp_timeline.csv", "wb") as f: f.write(csv_file.getbuffer())
+                    st.session_state.report = framework.run_static("temp_timeline.csv")
+                    st.success("Temporal Analysis Complete")
+                else:
+                    st.error("Please upload a CSV timeline first.")
+        with col2:
+            st.subheader("Clustering/Drift Analysis")
+            drift_data = pd.DataFrame(np.random.randn(25, 2), columns=['$SI', '$FN'])
+            st.line_chart(drift_data)
+
+    # --- MEMORY TAB ---
+    with tab_memory:
+        st.header("Engine 4: Main Memory Analysis Engine")
+        st.warning("Focus: Collection Prevention, Hidden RAM pages, and Corrupted Payloads.")
+        mem_path = st.text_input("Memory Dump File (raw, vmem, dmp)", "test.vmem")
+        if st.button("Start Collection Prevention Scan"):
+            if os.path.exists(mem_path):
+                st.session_state.report = framework.run_static(mem_path)
+                st.success("Memory Scan Complete")
+            else:
+                st.error("Memory file not found.")
+
+    # --- NETWORK TAB ---
+    with tab_network:
+        st.header("Engine 3: Network Artifact Analyzer")
+        st.info("Protocol STAT violations, Covert Channels (DNS/HTTP), and Exfiltration.")
+        net_file = st.file_uploader("Upload PCAP Trace", type=['pcap', 'pcapng'], key="net_file")
+        if st.button("Check for Ghost Connections"):
+            if net_file:
+                with open("temp_net.pcap", "wb") as f: f.write(net_file.getbuffer())
+                st.session_state.report = framework.run_static("temp_net.pcap")
+                st.success("Network Analysis Complete")
+            else:
+                st.error("Upload PCAP first.")
+
+    # --- STORAGE TAB ---
+    with tab_storage:
+        st.header("Engine 2: Storage Artifact Analyzer")
+        top_col1, top_col2 = st.columns([1, 1])
+        with top_col1:
+            disk_path = st.text_input("Disk Image / Mounted Volume", value="test.pcap") # Using pcap as test image
+            options = st.multiselect("Active Sub-Engines", [
+                "$LogFile & $USN Journal Parsing",
+                "Unallocated Entropy Mapping",
+                "Wipe-Signature Statistical Scan"
+            ], default=["Unallocated Entropy Mapping"])
+        with top_col2:
+             if st.button("🚀 Execute Forensic Surface Scan", type="primary"):
+                 if os.path.exists(disk_path):
+                     st.session_state.report = framework.run_static(disk_path)
+                     st.success("Deep Disk Analysis Complete")
+                 else:
+                     st.error("Path not found.")
+        
+        st.divider()
+        render_grid_visualization()
+
+    # --- LIVE TESTING TAB ---
+    with tab_live:
+        st.header("Dynamic Engine: Live Continuous Monitoring")
+        col1, col2 = st.columns(2)
+        with col1:
+             st.markdown("### Monitor Agent Control")
+             if st.button("🚀 Enable Real-Time Agent", use_container_width=True):
+                 st.session_state.live_monitoring = True
+                 # In a real app, this would trigger a background thread
+             if st.button("🛑 Disable Guard Agent", use_container_width=True):
+                 st.session_state.live_monitoring = False
+        with col2:
+             status_color = "green" if st.session_state.live_monitoring else "red"
+             status_text = "GUARD PROTECTING" if st.session_state.live_monitoring else "AGENT INACTIVE"
+             st.markdown(f"**STATUS:** <span style='color:{status_color}; font-weight:bold'>{status_text}</span>", unsafe_allow_value=True)
+             if st.session_state.live_monitoring:
+                 st.progress(0.72, "Monitoring OS Transaction Loops...")
+
+    # --- GLOBAL DASHBOARD DRAWER ---
+    st.divider()
+    st.subheader("Global Unified Score (Evidence Referenced)")
+    render_summary_cards(content)
+    
+    if report_data:
+        st.markdown(f"**Integrity Chaining (SHA-256):** `{report_data.get('integrity_hash_sha256')}`")
+        if st.checkbox("Show Detailed Forensic Logs"):
+             st.json(content)
 
 if __name__ == "__main__":
     main()

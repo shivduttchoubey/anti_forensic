@@ -1,40 +1,31 @@
 {
-  "integrity_hash_sha256": "placeholder_hash_123",
-  "content": {
-    "DESTROY": [],
-    "MODIFY": [],
-    "HIDE": [
-      {
-        "anomaly_type": "ghost_connection",
-        "evidence": {
-          "streams": [
+    "integrity_hash_sha256": "49e1de5c4bda75f942cd8adabb9c7f0b6469a7383ffb03c17a3869284a8eec6b",
+    "content": {
+        "DESTROY": [],
+        "MODIFY": [
             {
-              "stream": "192.168.1.1:5000-10.0.0.1:443",
-              "description": "data without handshake"
-            }
-          ]
-        },
-        "confidence": 0.6
-      }
-    ],
-    "FABRICATE": [],
-    "PREVENT": [
-      {
-        "anomaly_type": "high_entropy",
-        "evidence": {
-          "regions": [
-            {
-              "offset": 0,
-              "entropy": 7.955302062911014
+                "category": "MODIFY",
+                "description": "Timestamp Mismatch: $SI Created (2020-01-01 00:00:00) != $FN Created (2024-05-20 12:30:00).",
+                "source": "Temporal Engine",
+                "reference": "File: /windows/system32/cmd.exe",
+                "confidence": 95,
+                "timestamp": "2026-02-28T10:44:00.066902"
             },
             {
-              "offset": 4096,
-              "entropy": 7.961148833434964
+                "category": "MODIFY",
+                "description": "Mass Timestamp Clustering: 600 entries at 2026-02-28 00:00:00.",
+                "source": "Temporal Engine",
+                "reference": "Log: test_timeline.csv",
+                "confidence": 80,
+                "timestamp": "2026-02-28T10:44:00.061856"
             }
-          ]
-        },
-        "confidence": 0.6
-      }
-    ]
-  }
+        ],
+        "HIDE": [],
+        "FABRICATE": [],
+        "PREVENT": [],
+        "metadata": {
+            "total_count": 2,
+            "generation_time": "2026-02-28T10:44:00.066936"
+        }
+    }
 }
