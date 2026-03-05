@@ -1,56 +1,14 @@
 {
-    "integrity_hash_sha256": "8c6fdd70811108580ae49951063a939d11ec94f2cc62bce8505c769af23e2164",
+    "integrity_hash_sha256": "4c49577f884ca2826a72d7a6affc077f9c303f8fb31bd2cf5f18036fbb6554a8",
     "content": {
         "DESTROY": [],
-        "MODIFY": [
-            {
-                "category": "MODIFY",
-                "description": "$SI/$FN Mismatch (Timestomping): $SI_Created='2019-01-01 00:00:00' vs $FN_Created='2026-02-25 14:32:00' (delta=2612 days 14:32:00). Classic signature of Timestomp.exe or Metasploit timestomp module.",
-                "source": "Temporal Engine",
-                "reference": "File: /windows/system32/evil.exe",
-                "confidence": 95,
-                "timestamp": "2026-02-28T22:23:38.450584"
-            },
-            {
-                "category": "MODIFY",
-                "description": "Mass Timestamp Clustering: 120 file records share the exact timestamp '2020-01-01 00:00:00'. Typical of bulk timestomping via scripted tools.",
-                "source": "Temporal Engine",
-                "reference": "Timeline: temp_timeline.csv",
-                "confidence": 85,
-                "timestamp": "2026-02-28T22:23:38.452590"
-            },
-            {
-                "category": "MODIFY",
-                "description": "Uniform 'Round' Timestamps: 121 records (84.6%) have a 00:00:00 time component. Strongly suggests scripted bulk timestamp modification.",
-                "source": "Temporal Engine",
-                "reference": "Timeline: temp_timeline.csv",
-                "confidence": 75,
-                "timestamp": "2026-02-28T22:23:38.466183"
-            }
-        ],
+        "MODIFY": [],
         "HIDE": [],
-        "FABRICATE": [
-            {
-                "category": "FABRICATE",
-                "description": "Prefetch Paradox: '/windows/prefetch/SDELETE.EXE-ABCDEF.pf' was executed at 2026-02-27 22:00:00 but has a creation time of 2026-02-27 23:00:00. The creation timestamp was backdated AFTER execution.",
-                "source": "Temporal Engine",
-                "reference": "File: /windows/prefetch/SDELETE.EXE-ABCDEF.pf",
-                "confidence": 97,
-                "timestamp": "2026-02-28T22:23:38.476377"
-            },
-            {
-                "category": "FABRICATE",
-                "description": "Impossible Sequence: Modification (2026-02-24 06:00:00) precedes Creation (2026-02-26 08:00:00). Indicates timestamp fabrication.",
-                "source": "Temporal Engine",
-                "reference": "File: /tmp/payload.bin",
-                "confidence": 92,
-                "timestamp": "2026-02-28T22:23:38.456831"
-            }
-        ],
+        "FABRICATE": [],
         "PREVENT": [],
         "metadata": {
-            "total_count": 5,
-            "generation_time": "2026-02-28T22:23:38.476420"
+            "total_count": 0,
+            "generation_time": "2026-03-01T10:38:23.724374"
         }
     }
 }
