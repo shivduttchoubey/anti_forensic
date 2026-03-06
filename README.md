@@ -58,6 +58,8 @@ streamlit run src/dashboard/app.py
 # Vera_crypt_module.py
 This is the Module to Map the hidden Veracrypt or similar hidden volume in the live drive.
 
-To run : python Vera_crypt_module.py
-
+To run : 
+```bash
+python Vera_crypt_module.py
+```
 
